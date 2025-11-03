@@ -1,0 +1,46 @@
+[project]
+name = "nanodet"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "cython>=3.1.6",
+    "matplotlib>=3.10.7",
+    "numpy>=2.3.4",
+    "omegaconf>=2.0.1",
+    "onnx>=1.19.1",
+    "onnx-simplifier>=0.4.36",
+    "opencv-python>=4.11.0.86",
+    "pyaml>=25.7.0",
+    "pycocotools>=2.0.10",
+    "pytorch-lightning>=2.0.0",
+    "tabulate>=0.9.0",
+    "tensorboard>=2.20.0",
+    "termcolor>=3.2.0",
+    "torch>=2.0",
+    "torchmetrics>=1.8.2",
+    "torchvision>=0.24.0",
+    "tqdm>=4.67.1",
+]
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+# All the following settings are optional:
+where = ["."] 
+include = ["nanodet*"]  
+namespaces = true 
+
+[tool.uv.sources]
+nanodet = { workspace = true }
+
+[tool.uv.extra-build-dependencies]
+nanodet = ["nanodet"]
+
+[dependency-groups]
+dev = [
+    "nanodet"
+]
