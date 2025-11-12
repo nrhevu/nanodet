@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import random
+from pathlib import Path
 from abc import ABCMeta, abstractmethod
 from typing import Dict, Optional, Tuple
 
@@ -59,8 +60,8 @@ class BaseDataset(Dataset, metaclass=ABCMeta):
         multi_scale: Optional[Tuple[float, float]] = None,
     ):
         assert mode in ["train", "val", "test"]
-        self.img_path = img_path
-        self.ann_path = ann_path
+        self.img_path = Path(img_path)
+        self.ann_path = Path(ann_path)
         self.input_size = input_size
         self.pipeline = Pipeline(pipeline, keep_ratio)
         self.keep_ratio = keep_ratio
@@ -71,7 +72,7 @@ class BaseDataset(Dataset, metaclass=ABCMeta):
         self.multi_scale = multi_scale
         self.mode = mode
 
-        self.data_info = self.get_data_info(ann_path)
+        self.data_info = self.get_data_info(self.ann_path, self.img_path)
 
     def __len__(self):
         return len(self.data_info)

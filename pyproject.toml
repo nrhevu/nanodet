@@ -6,11 +6,12 @@ readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
     "cython>=3.1.6",
+    "imagesize>=1.4.1",
     "matplotlib>=3.10.7",
-    "numpy>=2.3.4",
+    "numpy>=2.3.3",
     "omegaconf>=2.0.1",
     "onnx>=1.19.1",
-    "onnx-simplifier>=0.4.36",
+    "onnxsim>=0.4.36",
     "opencv-python>=4.11.0.86",
     "pyaml>=25.7.0",
     "pycocotools>=2.0.10",

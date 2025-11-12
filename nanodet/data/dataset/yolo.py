@@ -15,15 +15,15 @@
 import logging
 import os
 import time
+from pathlib import Path
 from collections import defaultdict
 from typing import Optional, Sequence
 
 import numpy as np
-from imagesize import imagesize
+import imagesize
 from pycocotools.coco import COCO
 
 from .coco import CocoDataset
-from .xml_dataset import get_file_list
 
 
 class CocoYolo(COCO):
@@ -62,7 +62,7 @@ class YoloDataset(CocoDataset):
                 return path
         return None
 
-    def yolo_to_coco(self, ann_path):
+    def yolo_to_coco(self, ann_path, img_path):
         """
         convert yolo annotations to coco_api
         :param ann_path:
@@ -70,7 +70,7 @@ class YoloDataset(CocoDataset):
         """
         logging.info("loading annotations into memory...")
         tic = time.time()
-        ann_file_names = get_file_list(ann_path, type=".txt")
+        ann_file_names = list(ann_path.glob("*.txt"))
         logging.info("Found {} annotation files.".format(len(ann_file_names)))
         image_info = []
         categories = []
@@ -82,8 +82,8 @@ class YoloDataset(CocoDataset):
         ann_id = 1
 
         for idx, txt_name in enumerate(ann_file_names):
-            ann_file = os.path.join(ann_path, txt_name)
-            image_file = self._find_image(os.path.splitext(ann_file)[0])
+            ann_file = ann_path / txt_name
+            image_file = self._find_image(img_path / txt_name.stem)
 
             if image_file is None:
                 logging.warning(f"Could not find image for {ann_file}")
@@ -140,6 +140,8 @@ class YoloDataset(CocoDataset):
                 ann_id += 1
 
         coco_dict = {
+            "info": {},
+            "licenses": [],
             "images": image_info,
             "categories": categories,
             "annotations": annotations,
@@ -150,7 +152,7 @@ class YoloDataset(CocoDataset):
         logging.info("Done (t={:0.2f}s)".format(time.time() - tic))
         return coco_dict
 
-    def get_data_info(self, ann_path):
+    def get_data_info(self, ann_path, img_path):
         """
         Load basic information of dataset such as image path, label and so on.
         :param ann_path: coco json file path
@@ -162,7 +164,7 @@ class YoloDataset(CocoDataset):
          ...
         ]
         """
-        coco_dict = self.yolo_to_coco(ann_path)
+        coco_dict = self.yolo_to_coco(ann_path, img_path)
         self.coco_api = CocoYolo(coco_dict)
         self.cat_ids = sorted(self.coco_api.getCatIds())
         self.cat2label = {cat_id: i for i, cat_id in enumerate(self.cat_ids)}
