@@ -164,6 +164,7 @@ class NanoDetLightningLogger(LightningLoggerBase):
     def _init_logger(self):
         self.logger = logging.getLogger(name=self.name)
         self.logger.setLevel(logging.INFO)
+        self.logger.propagate = False  # Prevent propagation to root logger
 
         # create file handler
         fh = logging.FileHandler(os.path.join(self._save_dir, "logs.txt"))

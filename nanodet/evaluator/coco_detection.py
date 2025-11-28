@@ -48,7 +48,8 @@ class CocoDetectionEvaluator:
         self.class_names = dataset.class_names
         self.coco_api = dataset.coco_api
         self.cat_ids = dataset.cat_ids
-        self.metric_names = ["mAP", "AP_50", "AP_75", "AP_small", "AP_m", "AP_l"]
+        self.metric_names = ["mAP", "AP_50", "AP_75", "AP_small", "AP_m", "AP_l",
+                             "AR_1", "AR_10", "AR_100", "AR_small", "AR_m", "AR_l"]
 
     def results2json(self, results):
         """
@@ -142,8 +143,25 @@ class CocoDetectionEvaluator:
         )
         logger.info("\n" + table)
 
-        aps = coco_eval.stats[:6]
+        # coco_eval.stats contains [AP@.5:.95, AP@.5, AP@.75, AP_small, AP_m, AP_l,
+        #                           AR@1, AR@10, AR@100, AR_small, AR_m, AR_l]
+        all_stats = coco_eval.stats
         eval_results = {}
-        for k, v in zip(self.metric_names, aps):
+        for k, v in zip(self.metric_names, all_stats):
             eval_results[k] = v
+
+        # Add more intuitive names for commonly used metrics
+        eval_results["Recall"] = all_stats[8]  # AR@100 (Average Recall at max 100 detections)
+
+        # Log key metrics summary
+        logger.info(
+            f"\n{'='*60}\n"
+            f"Key Metrics Summary:\n"
+            f"  mAP@0.5:0.95 = {all_stats[0]:.4f}\n"
+            f"  mAP@0.5      = {all_stats[1]:.4f}\n"
+            f"  mAP@0.75     = {all_stats[2]:.4f}\n"
+            f"  Recall@100   = {all_stats[8]:.4f}\n"
+            f"{'='*60}"
+        )
+
         return eval_results
